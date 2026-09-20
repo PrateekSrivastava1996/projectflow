@@ -108,9 +108,15 @@ export default function CreateTaskForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm font-medium">Priority</label>
+            <label
+              htmlFor="task-priority"
+              className="mb-1 block text-sm font-medium"
+            >
+              Priority
+            </label>
 
             <select
+              id="task-priority"
               value={priority}
               onChange={(event) =>
                 setPriority(event.target.value as TaskPriority)
@@ -125,9 +131,15 @@ export default function CreateTaskForm({
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Status</label>
+            <label
+              htmlFor="task-status"
+              className="mb-1 block text-sm font-medium"
+            >
+              Status
+            </label>
 
             <select
+              id="task-status"
               value={status}
               onChange={(event) => setStatus(event.target.value as TaskStatus)}
               className="w-full rounded-lg border px-3 py-2"
