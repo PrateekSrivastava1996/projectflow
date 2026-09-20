@@ -157,6 +157,21 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    const memberships = await prisma.membership.findMany({
+      where: {
+        userId: user.id,
+      },
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
     const accessToken = createAccessToken(user.id);
     const refreshToken = createRefreshToken(user.id);
 
@@ -179,6 +194,12 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
       },
+      organizations: memberships.map((membership) => ({
+        id: membership.organization.id,
+        name: membership.organization.name,
+        slug: membership.organization.slug,
+        role: membership.role,
+      })),
     });
   } catch (error) {
     console.error("Login failed:", error);

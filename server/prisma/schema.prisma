@@ -19,6 +19,11 @@ model User {
 
   memberships Membership[]
   refreshTokens RefreshToken[]
+  tasks Task[]
+
+  comments  Comment[]
+  activities Activity[]
+  notifications Notification[]
 }
 
 model Organization {
@@ -31,6 +36,7 @@ model Organization {
 
   memberships Membership[]
   invitations Invitation[]
+  projects Project[]
 }
 
 model Membership {
@@ -82,4 +88,139 @@ model Invitation {
 
   @@index([email])
   @@index([organizationId])
+}
+
+model Project {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+  slug        String
+
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+}
+
+model Task {
+  id String @id @default(cuid())
+
+  title       String
+  description String?
+
+  projectId String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  status   TaskStatus @default(TODO)
+  priority TaskPriority @default(MEDIUM)
+
+  assigneeId String?
+
+  assignee User? @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  dueDate DateTime?
+
+  labels TaskLabel[]
+
+  comments  Comment[]
+  activities Activity[]
+  
+  notifications Notification[]  
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([assigneeId])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model TaskLabel {
+  id String @id @default(cuid())
+
+  name  String
+  color String
+
+  taskId String
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, name])
+  @@index([taskId])
+}
+
+model Comment {
+  id String @id @default(cuid())
+
+  content String
+
+  taskId String
+  userId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Activity {
+  id String @id @default(cuid())
+
+  action String
+  details String?
+
+  taskId String
+  userId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  userId    String
+  taskId    String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([taskId])
+  @@index([userId, read])
 }

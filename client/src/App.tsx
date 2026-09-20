@@ -1,40 +1,23 @@
-import { useEffect, useState } from "react";
-import { getHealth } from "./api/client";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProjectsPage from "./pages/ProjectsPage";
+import ProjectPage from "./pages/ProjectPage";
 
-type HealthResponse = {
-  status: string;
-  message: string;
-};
-
-function App() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    getHealth()
-      .then(setHealth)
-      .catch(() => {
-        setError("Unable to connect to ProjectFlow API");
-      });
-  }, []);
-
+export default function App() {
   return (
-    <div>
-      <h1>ProjectFlow</h1>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-      <p>Project management platform</p>
+        <Route path="/login" element={<LoginPage />} />
 
-      <h2>API Status</h2>
+        <Route path="/dashboard" element={<DashboardPage />} />
 
-      {health && (
-        <p>
-          {health.status}: {health.message}
-        </p>
-      )}
+        <Route path="/projects" element={<ProjectsPage />} />
 
-      {error && <p>{error}</p>}
-    </div>
+        <Route path="/projects/:projectId" element={<ProjectPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;

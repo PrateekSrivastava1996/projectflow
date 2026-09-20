@@ -1,11 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
-export async function getHealth() {
-  const response = await fetch(`${API_URL}/api/health`);
-
-  if (!response.ok) {
-    throw new Error("Failed to connect to API");
-  }
-
-  return response.json();
-}
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
